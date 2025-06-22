@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Le jeu des mots</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+    }
+    .word {
+      font-size: 3em;
+      letter-spacing: 10px;
+    }
+    .letter {
+      display: inline-block;
+      padding: 5px;
+      border-bottom: 2px solid #ccc;
+      min-width: 30px;
+      transition: background-color 0.3s;
+    }
+    .correct {
+      color: green;
+    }
+    .wrong {
+      background-color: red;
+      color: white;
+    }
+    img {
+      width: 200px;
+      height: auto;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Le jeu des mots</h1>
+  <img id="image" src="" alt="Word image">
+  <div id="word" class="word"></div>
+
+<br><br><br><br><br>
+
+<p>Fait avec amour pour Loulou et Doudou</p>
+<p> - Papa</p>
+
+  <script>
+    const words = ["APPLE", "BALL", "CAT", "DOG", "ELEPHANT", "FISH", "GIRAFFE", "HOUSE", "ICE", "JUMP", "KITE", "LION", "MONKEY", "NEST", "ORANGE", "PENGUIN", "QUEEN", "RAIN", "SUN", "TREE", "UMBRELLA", "VIOLIN", "WHALE", "XYLOPHONE", "YELLOW", "ZEBRA", "CAR", "BOOK", "CHAIR", "DOOR", "EGG", "FAN", "GOAT", "HAT", "INK", "JAR", "KEY", "LEAF", "MILK", "NOSE", "OWL", "POT", "QUIZ", "ROPE", "SHOE", "TIGER", "PLANET", "VAN", "WALL", "ZIP"];
+
+    let currentWord = "";
+    let currentIndex = 0;
+
+    const wordContainer = document.getElementById("word");
+    const image = document.getElementById("image");
+
+    const correctSound = new Audio("Assets/Sounds/successed-295058.mp3");
+const wrongSound = new Audio("Assets/Sounds/error-126627.mp3");
+
+    function loadWord() {
+  currentWord = words[Math.floor(Math.random() * words.length)];
+  currentIndex = 0;
+  wordContainer.innerHTML = "";
+
+  for (let letter of currentWord) {
+    const span = document.createElement("span");
+    span.textContent = letter;
+    span.classList.add("letter");
+    wordContainer.appendChild(span);
+  }
+
+  image.src = `./Assets/images/${currentWord}.jpg`;
+
+  // 👇 Speak the word
+  const utterance = new SpeechSynthesisUtterance(currentWord);
+  utterance.lang = 'en-US'; // or 'fr-CA' for French Canadian, depending on your use
+  speechSynthesis.speak(utterance);
+}
+
+    function flashRed(letterSpan) {
+      letterSpan.classList.add("wrong");
+      setTimeout(() => {
+        letterSpan.classList.remove("wrong");
+      }, 300);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (!currentWord) return;
+      const expected = currentWord[currentIndex];
+      const pressed = e.key.toUpperCase();
+      const letterSpans = document.querySelectorAll(".letter");
+
+      if (pressed === expected) {
+        correctSound.play();
+        letterSpans[currentIndex].classList.add("correct");
+        currentIndex++;
+        if (currentIndex >= currentWord.length) {
+          setTimeout(loadWord, 1000);
+        }
+      } else {
+        wrongSound.play();
+        flashRed(letterSpans[currentIndex]);
+      }
+    });
+
+    loadWord();
+  </script>
+</body>
+</html>
